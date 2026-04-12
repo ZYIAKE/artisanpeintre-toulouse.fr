@@ -1,0 +1,17 @@
+{
+  "name": "2PC Peinture - Artisan Peintre Toulouse",
+  "short_name": "2PC Peinture",
+  "description": "Artisan peintre en batiment a Toulouse (31). Peinture interieure, exterieure, ravalement.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#3A5A40",
+  "background_color": "#ffffff",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

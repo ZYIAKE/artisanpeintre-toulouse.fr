@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.artisanpeintre-toulouse.fr/sitemap.xml
+Sitemap: https://artisanpeintre-toulouse.fr/sitemap.xml
