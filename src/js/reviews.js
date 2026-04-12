@@ -165,7 +165,8 @@ async function loadGoogleReviews() {
   if (!container) return
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`, {
+    const domain = window.location.hostname.replace(/^www\./, '')
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}?domain=${domain}`, {
       headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
