@@ -52,6 +52,51 @@ const observer = new IntersectionObserver(
 )
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
 
+// ══ STAT COUNTERS (animates 0 → target on scroll into view) ══
+// Looks for `.stat-number` elements and animates the leading integer
+// from 0 to its final value over ~1.4s. Keeps suffixes like "+" or "/5"
+// intact by parsing only the digits at the start.
+const statObserver = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      const el = entry.target
+      const finalText = el.textContent.trim()
+      const match = finalText.match(/^(\d+(?:[\.,]\d+)?)(.*)$/)
+      if (!match) {
+        statObserver.unobserve(el)
+        return
+      }
+      const endRaw = match[1].replace(',', '.')
+      const suffix = match[2] || ''
+      const end = parseFloat(endRaw)
+      const isFloat = endRaw.includes('.')
+      const duration = 1400
+      const start = performance.now()
+
+      function step(now) {
+        const p = Math.min(1, (now - start) / duration)
+        // ease-out cubic
+        const e = 1 - Math.pow(1 - p, 3)
+        const current = end * e
+        el.textContent = (isFloat ? current.toFixed(1) : Math.round(current)) + suffix
+        if (p < 1) requestAnimationFrame(step)
+        else el.textContent = (isFloat ? end.toFixed(1) : end) + suffix
+      }
+      requestAnimationFrame(step)
+      statObserver.unobserve(el)
+    })
+  },
+  { threshold: 0.5 }
+)
+document.querySelectorAll('.stat-number').forEach(el => {
+  // Snapshot the final text BEFORE we reset to 0, so the observer
+  // callback can read the true target from data-stat-final.
+  el.dataset.statFinal = el.textContent.trim()
+  // Don't reset inline to avoid layout shift — just start observing.
+  statObserver.observe(el)
+})
+
 // ══ SMOOTH SCROLL ══
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {

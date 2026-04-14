@@ -14,8 +14,8 @@
     gtag('js',new Date());
     gtag('config','G-070RDMJKHE');
   }
-  if('requestIdleCallback' in window){requestIdleCallback(loadGtag)}
-  else{setTimeout(loadGtag,3000)}
+  // ── COOKIE-CONSENT GATED GA4 ── only load after user accepts via cookie-consent.js
+  window.__loadGA4 = loadGtag;
 </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://slcksfqbsbcmvqupbhox.supabase.co" crossorigin>
@@ -389,5 +389,19 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/form-handler.js"></script>
+
+  <!-- ══ COOKIE CONSENT BANNER (RGPD) ══ -->
+  <div id="cookie-consent-banner" hidden role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc">
+    <p id="cookie-title"><strong>Cookies analytiques</strong></p>
+    <p id="cookie-desc">
+      Nous utilisons Google Analytics pour comprendre comment vous utilisez notre site et améliorer votre expérience. Aucune donnée personnelle n'est vendue.
+      <a href="/politique-confidentialite">En savoir plus</a>.
+    </p>
+    <div class="cookie-actions">
+      <button type="button" id="cookie-refuse">Refuser</button>
+      <button type="button" id="cookie-accept">Accepter</button>
+    </div>
+  </div>
+  <script type="module" src="/src/js/cookie-consent.js"></script>
 </body>
 </html>
