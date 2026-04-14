@@ -40,13 +40,30 @@ function findHtmlFiles(dir, out = []) {
   return out;
 }
 
-// ── Patch 1: strip Clarity placeholder script ──
-function stripClarity(html) {
-  // Matches the one-line Clarity IIFE + optional leading whitespace + newline
-  return html.replace(
+// ── Patch 1: install Microsoft Clarity (gated on cookie consent) ──
+// The real Clarity project ID for artisanpeintre-toulouse.fr, retrieved from
+// Bing Webmaster Tools → Microsoft Clarity → Complete setup.
+// Stored on crm_clients.clarity_project_id in Supabase (source of truth).
+const CLARITY_ID = 'wbkx4842k1';
+
+// Remove the old placeholder (if any), then install a gated loader that
+// exposes window.__loadClarity — called by cookie-consent.js on accept.
+function installClarity(html) {
+  // Strip the old placeholder (auto-loaded Clarity, unconfigured)
+  let out = html.replace(
     /\s*<script>\(function\(c,l,a,r,i,t,y\)\{[^<]*?\}\)\(window,document,"clarity","script","PLACEHOLDER_CLARITY_ID"\);<\/script>\n?/g,
     '',
   );
+  // Strip any previously-installed gated Clarity (idempotent re-run)
+  out = out.replace(
+    /\s*<!-- COOKIE-CONSENT GATED CLARITY -->[\s\S]*?<\/script>\n?/g,
+    '',
+  );
+  // Install the gated loader right before </head>
+  const block =
+    `\n  <!-- COOKIE-CONSENT GATED CLARITY — loaded by cookie-consent.js on user accept -->\n` +
+    `  <script>window.__loadClarity=function(){if(window.clarity&&window.clarity.q)return;(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${CLARITY_ID}")};</script>\n`;
+  return out.replace(/<\/head>/, block + '</head>');
 }
 
 // ── Patch 2: add apple-touch-icon link ──
@@ -106,7 +123,7 @@ function injectCookieBanner(html) {
 
 function patch(html) {
   let out = html;
-  out = stripClarity(out);
+  out = installClarity(out);
   out = addAppleTouchIcon(out);
   out = gateGA4OnConsent(out);
   out = injectCookieBanner(out);

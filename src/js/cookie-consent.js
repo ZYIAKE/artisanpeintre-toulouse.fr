@@ -27,6 +27,15 @@
       window[GA_LOADER_KEY]();
     }
   }
+  function loadClarity() {
+    if (typeof window.__loadClarity === 'function') {
+      window.__loadClarity();
+    }
+  }
+  function loadAll() {
+    loadGA4();
+    loadClarity();
+  }
 
   function hideBanner() {
     var b = document.getElementById('cookie-consent-banner');
@@ -39,7 +48,7 @@
     if (accept) {
       accept.addEventListener('click', function () {
         setConsent('accepted');
-        loadGA4();
+        loadAll();
         hideBanner();
       });
     }
@@ -54,8 +63,8 @@
   function init() {
     var consent = getConsent();
     if (consent === 'accepted') {
-      // Already accepted in a previous visit — load GA4 silently
-      loadGA4();
+      // Already accepted in a previous visit — load GA4 + Clarity silently
+      loadAll();
       hideBanner();
       return;
     }
